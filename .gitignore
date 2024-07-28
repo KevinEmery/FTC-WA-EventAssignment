@@ -52,3 +52,7 @@ docs/_build/
 # Ignore local test files
 testbed.py
 test.py
+
+# Ignore local data I/O files
+data/
+output/
