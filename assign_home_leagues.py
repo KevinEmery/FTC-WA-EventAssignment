@@ -18,7 +18,7 @@ NUMBER_OF_ITERATIONS = 100
 TEAM_FILE = "./data/2023-2024-teams.csv"
 LEAGUE_FILE = "./data/2024-2025-events.csv"
 PRE_ASSIGNMENTS_FILE = "./data/2024-2025-temp-pre-assignments.csv"
-MAP_OUTPUT_FILE = "./output/map.csv"
+MAP_OUTPUT_FILE = "./output/home_league_map.csv"
 HOME_LEAGUE_ASSIGNMENT_FILE = "./output/home_league_assignments.csv"
 
 # 7/28/24 Notes
