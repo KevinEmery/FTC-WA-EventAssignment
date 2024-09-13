@@ -7,16 +7,20 @@ class League(object):
         self.zip_code = zip_code
         self.capacity = capacity
         self.teams = []
-        self.team_distances = []
+        self.team_distances = {}
 
 
-    def add_team(self, team: Team, distance: float):
+    def add_team(self, team: Team, distance: float = 0):
         self.teams.append(team)
-        self.team_distances.append(distance)
+        self.team_distances[team] =distance 
+
+    def remove_team(self, team: Team):
+        self.teams.remove(team)
+        self.team_distances.pop(team)
 
     def get_sum_of_distances(self, squared: bool = False):
         total = 0
-        for d in self.team_distances:
+        for d in self.team_distances.values():
             if squared:
                 total += d * d
             else:
