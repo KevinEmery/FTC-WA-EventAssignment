@@ -6,7 +6,8 @@ from collections import OrderedDict
 from typing import List, Tuple
 from uszipcode import SearchEngine
 
-import util
+import file_utils
+import map_utils
 
 from model.league import League
 from model.team import Team
@@ -14,8 +15,8 @@ from model.team import Team
 NUMBER_OF_ITERATIONS = 100
 
 TEAM_FILE = "./data/2023-2024-teams.csv"
-LEAGUE_FILE = "./data/2023-2024-events.csv"
-PRE_ASSIGNMENTS_FILE = "./data/2023-2024-pre-assignments.csv"
+LEAGUE_FILE = "./data/2024-2025-events.csv"
+PRE_ASSIGNMENTS_FILE = "./data/2024-2025-temp-pre-assignments.csv"
 MAP_OUTPUT_FILE = "./output/map.csv"
 HOME_LEAGUE_ASSIGNMENT_FILE = "./output/home_league_assignments.csv"
 
@@ -31,8 +32,8 @@ HOME_LEAGUE_ASSIGNMENT_FILE = "./output/home_league_assignments.csv"
 # the code here for posterity but expect that we'll move forward with zip-code assignment for now.
 
 def assign_home_leagues_per_zip_code() -> List[League]:
-    teams = load_teams_from_file(TEAM_FILE)
-    leagues = load_leagues_from_file(LEAGUE_FILE)
+    teams = file_utils.load_teams_from_file(TEAM_FILE)
+    leagues = file_utils.load_leagues_from_file(LEAGUE_FILE)
 
     initial_leagues, initial_teams = assign_pre_allocated_teams(PRE_ASSIGNMENTS_FILE, leagues, teams)
 
@@ -54,7 +55,7 @@ def assign_home_leagues_per_zip_code() -> List[League]:
             if league.get_open_capacity() < len(teams):
                 continue
 
-            distance = util.calculate_distance_between_team_and_league(teams[0], league)
+            distance = map_utils.calculate_distance_between_team_and_league(teams[0], league)
             if distance < min_distance:
                 min_distance = distance
                 closest_league = league
@@ -68,8 +69,8 @@ def assign_home_leagues_per_zip_code() -> List[League]:
     return initial_leagues
 
 def assign_home_leagues_per_team() -> List[League]:
-    teams = load_teams_from_file(TEAM_FILE)
-    leagues = load_leagues_from_file(LEAGUE_FILE)
+    teams = file_utils.load_teams_from_file(TEAM_FILE)
+    leagues = file_utils.load_leagues_from_file(LEAGUE_FILE)
 
     initial_leagues, initial_teams = assign_pre_allocated_teams(PRE_ASSIGNMENTS_FILE, leagues, teams)
 
@@ -90,7 +91,7 @@ def assign_home_leagues_per_team() -> List[League]:
                 if league.is_full():
                     continue
 
-                distance = util.calculate_distance_between_team_and_league(team, league)
+                distance = map_utils.calculate_distance_between_team_and_league(team, league)
                 if distance < min_distance:
                     min_distance = distance
                     closest_league = league
@@ -109,47 +110,6 @@ def assign_home_leagues_per_team() -> List[League]:
             best_leagues = copy.deepcopy(base_leagues)
 
     return best_leagues
-
-def print_league_assignments(leagues: List[League]):
-    template = "{league_name},{team_number}\n"
-
-    with open(HOME_LEAGUE_ASSIGNMENT_FILE, "w") as file:
-        for league in leagues:
-            league.teams.sort()
-            for team in league.teams:
-                file.write(template.format(league_name=league.name,team_number=team.number,team_name=team.name,team_zip=team.zip_code))
-
-def print_league_map(leagues: List[League]):
-    maps_template = "\"POINT ({long} {lat})\",{team},{league_name}\n"
-    search = SearchEngine()
-
-    with open(MAP_OUTPUT_FILE, "w") as file:
-        file.write("WKT,name,League\n")
-        for league in leagues:
-            league.teams.sort()
-            for team in league.teams:
-                zip = search.by_zipcode(team.zip_code)
-                file.write(maps_template.format(lat=zip.lat,long=zip.lng,league_name=league.name,team=team.number)) 
-
-def load_teams_from_file(filename: str) -> List[Team]:
-    teams = []
-
-    with open(filename, "r") as file:
-        for line in file:
-            split = line.strip().split(",")
-            teams.append(Team(int(split[0]), split[2], split[1]))
-
-    return teams
-
-def load_leagues_from_file(filename: str) -> List[League]:
-    leagues = []
-
-    with open(filename, "r") as file:
-        for line in file:
-            split = line.strip().split(",")
-            leagues.append(League(split[0], split[1], int(split[2])))
-
-    return leagues
 
 # Returns the leagues with pre-allocated teams added, as well as the list
 # of teams that still need to be placed.
@@ -179,5 +139,5 @@ def assign_pre_allocated_teams(filename: str, leagues: List[League], teams: List
 
 
 league_assignments = assign_home_leagues_per_zip_code()
-print_league_assignments(league_assignments)
-print_league_map(league_assignments)
+file_utils.write_league_assignments_to_file(league_assignments, HOME_LEAGUE_ASSIGNMENT_FILE)
+file_utils.write_league_assignments_to_map_file(league_assignments, MAP_OUTPUT_FILE)
