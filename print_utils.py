@@ -8,3 +8,4 @@ def print_league_summary(leagues: List[League]):
 
     for league in leagues:
         print(template.format(name=league.name, count=str(len(league.teams)), capacity=str(league.capacity)))
+    print("")
