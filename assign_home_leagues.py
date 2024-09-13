@@ -8,6 +8,7 @@ from uszipcode import SearchEngine
 
 import file_utils
 import map_utils
+import print_utils
 
 from model.league import League
 from model.team import Team
@@ -139,5 +140,6 @@ def assign_pre_allocated_teams(filename: str, leagues: List[League], teams: List
 
 
 league_assignments = assign_home_leagues_per_zip_code()
+print_utils.print_league_summary(league_assignments)
 file_utils.write_league_assignments_to_file(league_assignments, HOME_LEAGUE_ASSIGNMENT_FILE)
 file_utils.write_league_assignments_to_map_file(league_assignments, MAP_OUTPUT_FILE)
