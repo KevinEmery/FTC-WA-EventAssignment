@@ -114,7 +114,7 @@ def assign_home_leagues_per_team() -> List[League]:
 
 # Returns the leagues with pre-allocated teams added, as well as the list
 # of teams that still need to be placed.
-def assign_pre_allocated_teams(filename: str, leagues: List[League], teams: List[League]) -> Tuple[List[League],List[Team]]:
+def assign_pre_allocated_teams(filename: str, leagues: List[League], teams: List[Team]) -> Tuple[List[League],List[Team]]:
     league_dict = {}
     team_dict = {}
 
